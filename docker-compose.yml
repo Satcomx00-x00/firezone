@@ -167,8 +167,8 @@ services:
     devices:
     - "/dev/net/tun:/dev/net/tun"
     depends_on:
-      api:
-        condition: "service_healthy"
+      - api
+        
     networks:
       app:
         ipv4_address: 172.28.0.105
