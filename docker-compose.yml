@@ -56,7 +56,7 @@ services:
       # Web Server
       EXTERNAL_URL: http://localhost:8080/
       PHOENIX_HTTP_WEB_PORT: "8080"
-      PHOENIX_SECURE_COOKIES: false
+      PHOENIX_SECURE_COOKIES: 0
       # Erlang
       ERLANG_DISTRIBUTION_PORT: 9000
       ERLANG_CLUSTER_ADAPTER: "Elixir.Cluster.Strategy.Epmd"
@@ -344,7 +344,7 @@ services:
       OUTBOUND_EMAIL_ADAPTER: "Elixir.Swoosh.Adapters.Postmark"
       ## Warning: The token is for the blackhole Postmark server created in a separate isolated account,
       ## that WILL NOT send any actual emails, but you can see and debug them in the Postmark dashboard.
-      OUTBOUND_EMAIL_ADAPTER_OPTS: '{"api_key":""}'
+      OUTBOUND_EMAIL_ADAPTER_OPTS: '{"api_key":"7da7d1cd-111c-44a7-b5ac-4027b9d230e5"}'
       # Mix env should be set to prod to use secrets declared above,
       # otherwise seeds will generate invalid tokens
       MIX_ENV: "prod"
