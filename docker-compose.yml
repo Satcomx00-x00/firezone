@@ -5,7 +5,7 @@ services:
   postgres:
     image: postgres:15.2
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+    - postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -16,10 +16,10 @@ services:
       interval: 30s
       retries: 5
       timeout: 5s
-    ports:
-      - 5432:5432/tcp
+    # ports:
+    # - 5432:5432/tcp
     networks:
-      - app
+    - app
 
   vault:
     image: vault:1.13.3
@@ -27,22 +27,14 @@ services:
       VAULT_ADDR: "http://127.0.0.1:8200"
       VAULT_DEV_ROOT_TOKEN_ID: "firezone"
       VAULT_LOG_LEVEL: "debug"
-    ports:
-      - 8200:8200/tcp
+    # ports:
+    # - 8200:8200/tcp
     cap_add:
-      - IPC_LOCK
+    - IPC_LOCK
     networks:
-      - app
+    - app
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--spider",
-          "--proxy",
-          "off",
-          "http://127.0.0.1:8200/v1/sys/health?standbyok=true",
-        ]
+      test: ["CMD", "wget", "--spider", "--proxy", "off", "http://127.0.0.1:8200/v1/sys/health?standbyok=true"]
       interval: 10s
       timeout: 3s
       retries: 10
@@ -53,13 +45,13 @@ services:
     build:
       context: elixir
       cache_from:
-        - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/web:main
+      - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/web:main
       args:
         APPLICATION_NAME: web
     image: us-east1-docker.pkg.dev/firezone-staging/firezone/web:${VERSION:-main}
     hostname: web.cluster.local
-    ports:
-      - 8080:8080/tcp
+    # ports:
+    # - 8080:8080/tcp
     environment:
       # Web Server
       EXTERNAL_URL: http://localhost:8080/
@@ -109,7 +101,7 @@ services:
       postgres:
         condition: "service_healthy"
     networks:
-      - app
+    - app
 
   client:
     environment:
@@ -122,19 +114,19 @@ services:
       context: rust
       dockerfile: Dockerfile
       cache_from:
-        - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/client:main
+      - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/client:main
       args:
         PACKAGE: firezone-linux-client
     image: us-east1-docker.pkg.dev/firezone-staging/firezone/client:${VERSION:-main}
     dns:
-      - 100.100.111.1
-      - 8.8.8.8
+    - 100.100.111.1
+    - 1.1.1.1
     cap_add:
-      - NET_ADMIN
+    - NET_ADMIN
     sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0
+    - net.ipv6.conf.all.disable_ipv6=0
     devices:
-      - "/dev/net/tun:/dev/net/tun"
+    - "/dev/net/tun:/dev/net/tun"
     depends_on:
       gateway:
         condition: "service_healthy"
@@ -160,20 +152,20 @@ services:
       context: rust
       dockerfile: Dockerfile
       cache_from:
-        - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/gateway:main
+      - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/gateway:main
       args:
         PACKAGE: firezone-gateway
     image: us-east1-docker.pkg.dev/firezone-staging/firezone/gateway:${VERSION:-main}
     cap_add:
-      - NET_ADMIN
+    - NET_ADMIN
     sysctls:
-      - net.ipv4.ip_forward=1
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv6.conf.all.forwarding=1
-      - net.ipv6.conf.default.forwarding=1
+    - net.ipv4.ip_forward=1
+    - net.ipv4.conf.all.src_valid_mark=1
+    - net.ipv6.conf.all.disable_ipv6=0
+    - net.ipv6.conf.all.forwarding=1
+    - net.ipv6.conf.default.forwarding=1
     devices:
-      - "/dev/net/tun:/dev/net/tun"
+    - "/dev/net/tun:/dev/net/tun"
     depends_on:
       api:
         condition: "service_healthy"
@@ -212,7 +204,7 @@ services:
       context: rust
       dockerfile: Dockerfile
       cache_from:
-        - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/relay:main
+      - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/relay:main
       args:
         PACKAGE: firezone-relay
     image: us-east1-docker.pkg.dev/firezone-staging/firezone/relay:${VERSION:-main}
@@ -226,12 +218,12 @@ services:
       api:
         condition: "service_healthy"
     ports:
-      # XXX: Only 111 ports are used for local dev / testing because Docker Desktop
-      # allocates a userland proxy process for each forwarded port X_X.
-      #
-      # Large ranges here will bring your machine to its knees.
-      - "55555-55666:55555-55666/udp"
-      - 3478:3478/udp
+    # XXX: Only 111 ports are used for local dev / testing because Docker Desktop
+    # allocates a userland proxy process for each forwarded port X_X.
+    #
+    # Large ranges here will bring your machine to its knees.
+    - "55555-55666:55555-55666/udp"
+    - 3478:3478/udp
     networks:
       app:
         ipv4_address: 172.28.0.101
@@ -240,13 +232,13 @@ services:
     build:
       context: elixir
       cache_from:
-        - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/api:main
+      - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/api:main
       args:
         APPLICATION_NAME: api
     image: us-east1-docker.pkg.dev/firezone-staging/firezone/api:${VERSION:-main}
     hostname: api.cluster.local
     ports:
-      - 8081:8081/tcp
+    - 8081:8081/tcp
     environment:
       # Web Server
       EXTERNAL_URL: http://localhost:8081/
@@ -302,7 +294,7 @@ services:
       retries: 5
       timeout: 5s
     networks:
-      - app
+    - app
 
   # This is a service container which allows to run mix tasks for local development
   # without having to install Elixir and Erlang on the host machine.
@@ -311,7 +303,7 @@ services:
       context: elixir
       target: compiler
       cache_from:
-        - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/elixir:main
+      - type=registry,ref=us-east1-docker.pkg.dev/firezone-staging/cache/elixir:main
       args:
         APPLICATION_NAME: api
     image: us-east1-docker.pkg.dev/firezone-staging/firezone/elixir:${VERSION:-main}
@@ -362,19 +354,19 @@ services:
       postgres:
         condition: "service_healthy"
     networks:
-      - app
+    - app
 
 networks:
   resources:
     enable_ipv6: false
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+      - subnet: 172.20.0.0/16
   app:
     enable_ipv6: false
     ipam:
       config:
-        - subnet: 172.28.0.0/16
+      - subnet: 172.28.0.0/16
 
 volumes:
   postgres-data:
