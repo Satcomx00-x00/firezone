@@ -96,10 +96,8 @@ services:
       # Seeds
       STATIC_SEEDS: "true"
     depends_on:
-      vault:
-        condition: "service_healthy"
-      postgres:
-        condition: "service_healthy"
+      - vault
+      - postgres
     networks:
     - app
 
@@ -128,12 +126,9 @@ services:
     devices:
     - "/dev/net/tun:/dev/net/tun"
     depends_on:
-      gateway:
-        condition: "service_healthy"
-      httpbin:
-        condition: "service_healthy"
-      api:
-        condition: "service_healthy"
+      - gateway
+      - httpbin
+      - api
     networks:
       app:
         ipv4_address: 172.28.0.100
@@ -215,8 +210,7 @@ services:
       retries: 5
       timeout: 5s
     depends_on:
-      api:
-        condition: "service_healthy"
+      - api
     ports:
     # XXX: Only 111 ports are used for local dev / testing because Docker Desktop
     # allocates a userland proxy process for each forwarded port X_X.
@@ -283,10 +277,9 @@ services:
       # Seeds
       STATIC_SEEDS: "true"
     depends_on:
-      vault:
-        condition: "service_healthy"
-      postgres:
-        condition: "service_healthy"
+      - vault
+      - postgres
+
     healthcheck:
       test: ["CMD-SHELL", "curl -f localhost:8081/healthz"]
       start_period: 20s
@@ -351,8 +344,7 @@ services:
       # Seeds
       STATIC_SEEDS: "true"
     depends_on:
-      postgres:
-        condition: "service_healthy"
+      - postgres
     networks:
     - app
 
